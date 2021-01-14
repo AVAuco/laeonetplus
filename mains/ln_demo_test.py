@@ -33,6 +33,7 @@ theSEED = 1330
 
 import tensorflow as tf
 from tensorflow.keras.models import load_model, model_from_json
+import ln_laeoNets
 
 # Tensorflow config
 # tf.set_random_seed(theSEED)
@@ -54,37 +55,58 @@ argv = sys.argv[1:]
 winlen = 10            # Fixed: temporal length
 
 # Define path to file containing the model
-dataset = "AVA"  # Choose: "AVA", "UCO"
-modeldir = homedir + "/models/best{}/".format(dataset.upper())
- # Models trained on UCO or AVA
-modelpath = osp.join(modeldir, "model-hmaps-tr{}.hdf5".format(dataset.lower()))
+dataset = "AVA"  # Choose: "AVA", "UCO" -- We recommend using the AVA-based model **
+
+modeldir = osp.join(homedir, "models/best{}/".format(dataset.upper()))
+pyver = sys.version[0]+sys.version[2]
+# Set model full path
+modelpath = osp.join(modeldir, "model-hmaps-tr{}_pyv{}.hdf5".format(dataset.lower(), pyver))  # This assumes that you use Python >= 3.6 (_pyv36)
+
 json_path = osp.join(modeldir, "model-hmaps-tr{}_config.json".format(dataset.lower()))
 wei_path = osp.join(modeldir, "model-hmaps-tr{}_weights.h5".format(dataset.lower()))
 
-# Load model into memory
+# Load model into memory: several alternatives are provided
  # Option 1) Requires Python 3.5
-if False:
-    model = load_model(modelpath)
-else:
- # Option 2) This should more compatible
+try:
+    model = load_model(modelpath, compile=False)
+    model_loaded = True
+finally:
+    print("WARN: could not load {}".format(modelpath))
+    model_loaded = False
 
-    with open(json_path) as json_file:
-        json_config = json_file.read()
-    model = model_from_json(json_config)
-    model.load_weights(wei_path)
+if not model_loaded:
+    print("INFO: using an alternative way to load the model")
+    # Option 2) This should be a bit more compatible
+    if False:
+        with open(json_path) as json_file:
+           json_config = json_file.read()
+        model = model_from_json(json_config)
+        model.load_weights(wei_path)
+    else:
+    # Option 3) The ultimate way of loading the model
+        from ln_laeoNets import mj_genNetHeadsGeoCropMap
+        model = mj_genNetHeadsGeoCropMap(10, densesize_top=32, ndense_top=1,
+                                        dropoutval=0.0, batchnorm=False, usel2=True, initfileFM="",
+                                        initfileHG="", initfileHead="", useMap=True,
+                                        freezehead=False, freezecrop=False, useFCrop=False,
+                                        useGeom=False, useself64=True, windowLenMap=10)
+        model.load_weights(wei_path, by_name=False)
+
+        # To save a model compatible with your Python version
+        if False:
+            new_model_name = osp.join(modeldir, "model-hmaps-tr{}_pyv{}.hdf5".format(dataset.lower(), pyver))
+            model.save(new_model_name)
 
 model.summary()
 
 if False:
     # This is just for exporting the model
-    #cfg = model.get_config()
-
     json_config = model.to_json()
 
     with open(json_path, 'w') as json_file:
         json_file.write(json_config)
-    # Save weights to disk
 
+    # Save weights to disk
     model.save_weights(wei_path)
 
 # Just for exporting maps to npy
@@ -101,13 +123,13 @@ imagesdir = homedir +"/data/ava_val_crop/"
 # Select the example
 # ===========================
 # The followings are LAEO
-#basename = "om_83F5VwTQ_01187_0000_pair_51_49"
+basename = "om_83F5VwTQ_01187_0000_pair_51_49"
 #basename = "covMYDBa5dk_01024_0000_pair_37_35"
 #basename = "7T5G0CmwTPo_00936_0000_pair_20_19"
 #basename = "914yZXz-iRs_01549_0000_pair_192_194"
 
 # The followings are not LAEO
-basename = "914yZXz-iRs_01569_0000_pair_196_195"
+#basename = "914yZXz-iRs_01569_0000_pair_196_195"
 #basename = "SCh-ZImnyyk_00902_0000_pair_1_0"
 
 pairspath = os.path.join(imagesdir, basename + ".jpg")
@@ -121,13 +143,9 @@ imgmaps = mj_inflateMeanMat(imgmaps, 10)
 # cv2.imshow("Pairs", imgpairs)
 # cv2.waitKey()
 
-# Load mean head and mean map
-# meanpath = homedir+"/models/meanhead.npy"
-# meansample = np.load(meanpath)
-
+# Load mean map (mean head is not used for LAEO-Net++)
 meanfile = os.path.join(homedir, "models", "meanmaps10.npy")
 mean_map5 = np.load(meanfile)
-print(mean_map5.max())
 
 # Prepare inputs
 ncols = imgpairs.shape[1]
