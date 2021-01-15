@@ -32,14 +32,3 @@ def mj_inflateMeanMat(data, winlen_new):
 
     return data_new
 
-
-winlen_new = 15  # To be changed
-
-meanfile = osp.join(homedir, "experiments/deepLAEO/meanMaps.h5")
-
-meanSampleFM = dd.io.load(meanfile)
-
-meanmap_new = mj_inflateMeanMat(meanSampleFM["meanmap"], winlen_new)
-meancrop_new = mj_inflateMeanMat(meanSampleFM["meancrop"], winlen_new)
-
-print("done!")
