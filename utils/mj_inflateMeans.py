@@ -4,7 +4,6 @@ import os.path as osp
 from os.path import expanduser
 homedir = expanduser("~")
 
-import deepdish as dd
 import numpy as np
 
 def mj_inflateMeanMat(data, winlen_new):
