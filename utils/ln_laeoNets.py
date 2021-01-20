@@ -1,6 +1,8 @@
 """
 Functions to create a LAEO-Net++ model
 
+Warning: right now, there are missing functions, not needed anyway.
+
 Reference:
 MJ. Marin-Jimenez, V. Kalogeiton, P. Medina-Suarez, A. Zisserman
 LAEO-Net++: revisiting people Looking At Each Other in videos

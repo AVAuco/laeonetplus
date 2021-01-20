@@ -36,14 +36,12 @@ from tensorflow.keras.models import load_model, model_from_json
 import ln_laeoNets
 
 # Tensorflow config
-# tf.set_random_seed(theSEED)
 tf.compat.v1.set_random_seed(theSEED)
 
-# config = tf.ConfigProto()
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = gpu_rate
 config.gpu_options.visible_device_list = ""  # "0"
-#set_session(tf.Session(config=config))
+
 tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))
 # for reproducibility
 np.random.seed(theSEED)
@@ -99,7 +97,7 @@ if not model_loaded:
 
 model.summary()
 
-if False:
+if False:  # You shouldn't need this
     # This is just for exporting the model
     json_config = model.to_json()
 
@@ -108,14 +106,6 @@ if False:
 
     # Save weights to disk
     model.save_weights(wei_path)
-
-# Just for exporting maps to npy
-if False:
-    import deepdish as dd
-    means_ = dd.io.load("/home/mjmarin/research/laeonetplus/models/meanmaps10.h5")
-    mmap = means_["meanmap"]
-    np.save("/home/mjmarin/research/laeonetplus/models/meanmaps10.npy", mmap)
-
 
 # Load test data (already cropped for speed)
 imagesdir = homedir +"/data/ava_val_crop/"

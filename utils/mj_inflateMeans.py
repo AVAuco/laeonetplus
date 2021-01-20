@@ -1,12 +1,19 @@
 # (c) MJMJ/2020
 
 import os.path as osp
-from os.path import expanduser
-homedir = expanduser("~")
+# from os.path import expanduser
+# homedir = expanduser("~")
 
 import numpy as np
 
-def mj_inflateMeanMat(data, winlen_new):
+
+def mj_inflateMeanMat(data, winlen_new=10):
+    """
+    Expands dimensions of input matrix
+    :param data: numpy matrix
+    :param winlen_new: integer used to expand the first dimension of matrix 'data'
+    :return: extended matrix
+    """
 
     side = data.shape[1]
     wlen = int(data.shape[0] / side)

@@ -1,9 +1,10 @@
 # LAEO-Net++
-_Code coming soon_  
+  
 
-See previous version [here](https://github.com/AVAuco/laeonet)
+[![Try In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/11abr3TV6Nb3pbjVTzE_tUOvMKRdE2NRm?usp=sharing)
 
-Support code for [LAEO-Net++ paper](https://arxiv.org/abs/2101.02136) (IEEE TPAMI, 2021).
+
+Official support code for [LAEO-Net++ paper](https://arxiv.org/abs/2101.02136) (IEEE TPAMI, 2021).
 
 <div align="center">
     <img src="./LAEOnetplus.png" alt="The LAEO-Net++ architecture" height="480">
@@ -11,7 +12,9 @@ Support code for [LAEO-Net++ paper](https://arxiv.org/abs/2101.02136) (IEEE TPAM
 The LAEO-Net++ receives as input two tracks of head crops and a tracks of maps containing the relative position of the heads, and 
 returns the probability of being LAEO those two heads.
 
+_Training code coming soon_
 
+See previous version [here](https://github.com/AVAuco/laeonet)
 
 ### Quick start
 
