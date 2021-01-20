@@ -12,7 +12,7 @@ Official support code for [LAEO-Net++ paper](https://arxiv.org/abs/2101.02136) (
 The LAEO-Net++ receives as input two tracks of head crops and a tracks of maps containing the relative position of the heads, and 
 returns the probability of being LAEO those two heads.
 
-_Training code coming soon_
+
 
 See previous version [here](https://github.com/AVAuco/laeonet)
 
