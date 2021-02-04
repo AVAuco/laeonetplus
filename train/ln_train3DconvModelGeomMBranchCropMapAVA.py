@@ -11,7 +11,7 @@ python train/ln_train3DconvModelGeomMBranchCropMapAVA.py -g 0.43 -e 60 -l 0.0001
 -d 0.2 -n 1 -s 32 -a 1 -z 0 -b 8 -f 1 -F 0 -k 0.3 -c 0 -R 2 -L 1 -m 0 -u 0 \
 --useframecrop=0 --usegeometry=0 --initfilefm="" --usemap=1 --mapwindowlen=10 -S 1 \
 --DEBUG=0 --trainuco=0 --testuco=1 --infix=_ss64jitter \
--w ./model-init-ssheadbrach.hdf5 --useself64=1
+-w ./model-init-ssheadbranch.hdf5 --useself64=1
 
 # exper_pt1_bs8_lr04p10f02_dr0.2_mwl10_ihn03_wh_nfc_nge_er02_cd_hl2_teuco_hs064ss_ss64jitter_nd1_ds32_ax1
 
