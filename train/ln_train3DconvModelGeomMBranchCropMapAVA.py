@@ -232,7 +232,11 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     print(npairs_val)
 
     # Load head data from Matlab file
-    fMsamples, fMposes = mj_getAFLWdata(toBGR=True)
+    if withSyntData:
+        fMsamples, fMposes = mj_getAFLWdata(toBGR=True)
+    else:
+        fMsamples = []
+        fMposes = []
 
     if hostname == "sylar-msi":
         nvalidationSamples = 50
@@ -557,7 +561,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
         nps_val = len(valid_idx_val)
         print("Valid tuples validation: {}".format(nps_val))
-
 
     if useVal4training:
         npairs_val = int(nps * 0.001)
