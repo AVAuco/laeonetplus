@@ -37,12 +37,12 @@ See older [GitHub repository](https://github.com/AVAuco/laeonet).
 
 Clone this repository:
 ```bash
-git clone git@github.com:AVAuco/laeonet.git
+git clone git@github.com:AVAuco/laeonetplus.git
 ```
 
 ### Training (_in progress_)
 
-We provide an example of training on AVA-LAEO data (using preprocessed samples): see the [training document](docs/training.md)
+We provide an example of training on AVA-LAEO data (using preprocessed samples): see the [training document](doc/training.md)
 
 
 ### References

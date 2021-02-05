@@ -3,7 +3,7 @@
 '''
 
 import mj_laeoUtils as LU
-from keras import preprocessing
+from tensorflow.keras import preprocessing
 from joblib import Parallel, delayed
 import numpy as np
 import cv2
@@ -11,6 +11,7 @@ import cv2
 from os.path import expanduser
 
 homedir = expanduser("~")
+
 
 def mj_gatherSampleFromId(trix_, laeoIdxs, allSamples, dim, meanSample,
                          augmentation, img_gen):

@@ -5,7 +5,8 @@
 import os
 import copy
 import numpy as np
-from keras import layers
+from tensorflow.keras import layers
+
 
 def mj_findLatestFileModel(inputdir, pattern, epoch_max=1000):
     '''

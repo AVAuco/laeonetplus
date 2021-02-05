@@ -113,6 +113,8 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     from tensorflow.keras.models import load_model
     import tensorflow.keras.backend as K
 
+    import deepdish as dd
+
     from ln_laeoNets import mj_genNetHeadsGeoCropMap
     from ln_dataGeneratorLAEOhgfm import DataGeneratorLAEOhgfm
     from ln_dataGeneratorLAEOsyn import DataGeneratorLAEOsyn
@@ -212,21 +214,23 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
     # Data from AVA-LAEO
     print('* Loading AVA data from file...')
-    avasubdir = "databases/ava_google/Annotations/LAEO/round3/"
-    pklfile = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + case_wanted + '__v2.2_tracks.pkl')
-
-    avalaeo_annots = AvaGoogleLAEOAnnotations(pklfile)
-    allSamples = avalaeo_annots.get_list_of_tuples(minlen=7)
+    # avasubdir = "databases/ava_google/Annotations/LAEO/round3/"
+    # pklfile = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + case_wanted + '__v2.2_tracks.pkl')
+    #
+    # avalaeo_annots = AvaGoogleLAEOAnnotations(pklfile)
+    # allSamples = avalaeo_annots.get_list_of_tuples(minlen=7)
+    allSamples = dd.io.load("./data/avalaeo_samplist_train.h5")
 
     npairs = len(allSamples)
     print(npairs)
 
     # Same for the validation partition of AVA
     print('* Loading AVA (validation) data from file...')
-    pklfile_val = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + 'val' + '__v2.2_tracks.pkl')
-
-    avalaeo_annots_val = AvaGoogleLAEOAnnotations(pklfile_val)
-    allSamples_val = avalaeo_annots_val.get_list_of_tuples(minlen=7)
+    # pklfile_val = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + 'val' + '__v2.2_tracks.pkl')
+    #
+    # avalaeo_annots_val = AvaGoogleLAEOAnnotations(pklfile_val)
+    # allSamples_val = avalaeo_annots_val.get_list_of_tuples(minlen=7)
+    allSamples_val = dd.io.load("./data/avalaeo_samplist_val.h5")
 
     npairs_val = len(allSamples_val)
     print(npairs_val)
@@ -307,7 +311,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     else:
         meanSampleH = [0.0]
 
-    import deepdish as dd
     meanfile = os.path.join(homedir, "experiments", "deepLAEO", "meanMaps.h5")
     meanSampleFM = dd.io.load(meanfile)
 
@@ -510,7 +513,11 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         os.makedirs(outdir)
 
     # Generators
-    nsamples = fMsamples.shape[3]
+    if withSyntData:
+        nsamples = fMsamples.shape[3]
+    else:
+        nsamples = 0
+
     if trainOnUCO:
         training_generator_uco = DataGeneratorLAEOhgfm(partition['train'], allSamples_uco, laeoIdxs, **params)
 
