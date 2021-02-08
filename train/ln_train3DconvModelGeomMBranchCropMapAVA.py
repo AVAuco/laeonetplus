@@ -214,7 +214,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         allSamples_uco = LU.mj_prepareTempLAEOsamples(laeoIdxs)
 
     # Data from AVA-LAEO
-    print('*Info: AVA-LAEO dir is '+avalaeodir)
+    print('* Info: AVA-LAEO dir is '+avalaeodir)
     print('* Loading AVA data from file...')
     # avasubdir = "databases/ava_google/Annotations/LAEO/round3/"
     # pklfile = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + case_wanted + '__v2.2_tracks.pkl')
@@ -545,6 +545,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     tar.close()
 
     nps = len(valid_idx)
+    np.savez('avalaeo_train_valid.npz', valid_idx)
     print("Valid tuples: {}".format(nps))
 
     tardirval = os.path.join(homedir, "experiments/ava/preprocdata/", subdirtar, "val")
@@ -570,6 +571,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         tar.close()
 
         nps_val = len(valid_idx_val)
+        np.savez('avalaeo_val_valid.npz', valid_idx_val)
         print("Valid tuples validation: {}".format(nps_val))
 
     if useVal4training:
@@ -705,7 +707,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 #            if not freezehead and useself64:
 #                nbatches = 10
 
-
         # Metrics
         cumm0 = 0
         cumm1 = 0
@@ -716,7 +717,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         nhardnegperbatch = int(np.ceil(batchsize*0.1))   # TODO: this is to be selected
 
         # Loop on batches
-
+        nbatches = 4   # DEVELOP!!!
         for batch_idx in range(0, nbatches):
             #print(batch_idx)
 
@@ -752,6 +753,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                     Yhn[:,0] = 1
                     Y = np.concatenate((Y, Yhn))
 
+                import pdb; pdb.set_trace()   # DEVELOP!
                 etrainR = model.train_on_batch(x=X, y=Y)
 
                 del X
@@ -1207,6 +1209,17 @@ if __name__ == '__main__':
             initmodel = arg			
         elif opt in ("-O", "--outdirbase"):
             outdirbase = arg			
+
+    # # DEVELOP: export head branch to multiple Python versions
+    # print("Loading head model...")
+    # json_path = osp.join(traindir, "../models/model-init-ssheadbranch.json")
+    # wei_path = osp.join(traindir, "../models/model-init-ssheadbranch_w.hdf5")
+    # with open(json_path) as json_file:
+    #     json_config = json_file.read()
+    # from tensorflow.keras.models import model_from_json
+    # modelh = model_from_json(json_config)
+    # modelh.load_weights(wei_path)
+    # modelh.save('model-init-ssheadbranch_py36.hdf5')
 
     # Call the main function
     ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=gpuRate, epcs=epochs, initialLR=lrate,
