@@ -528,30 +528,35 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     print("Choosing valid training samples...")
     import tarfile
     valid_idx = []
-    # Check what files are included in the TAR
-    if not os.path.exists(tarname):
-        print("ERROR: cannot find tar file: {}".format(tarname))
-        exit(-1)
-    tar = tarfile.open(tarname, 'r')
+    file_valid_idx = "./data/avalaeo_train_valid.h5"
+    if os.path.exists(file_valid_idx):
+        valid_idx = dd.io.load(file_valid_idx)
+    else:
+        # Check what files are included in the TAR
+        if not os.path.exists(tarname):
+            print("ERROR: cannot find tar file: {}".format(tarname))
+            exit(-1)
+        tar = tarfile.open(tarname, 'r')
 
-    all_names = tar.getnames()
+        all_names = tar.getnames()
 
-    for i in range(0, len(allSamples)):
-        tup = allSamples[i]
-        memname = tup[0].replace("/", "_") + "_0000_" + tup[1] + ".jpg"
+        for i in range(0, len(allSamples)):
+            tup = allSamples[i]
+            memname = tup[0].replace("/", "_") + "_0000_" + tup[1] + ".jpg"
 
-        if memname in all_names:
-            valid_idx.append(i)
-    tar.close()
-
+            if memname in all_names:
+                valid_idx.append(i)
+        tar.close()
+        
+        dd.io.save(file_valid_idx, valid_idx)
     nps = len(valid_idx)
-    np.savez('avalaeo_train_valid.npz', valid_idx)
     print("Valid tuples: {}".format(nps))
 
     tardirval = os.path.join(homedir, "experiments/ava/preprocdata/", subdirtar, "val")
     tarnameval = os.path.join(tardirval, "allsamples"+suffix+".tar")
+    
     valid_idx_val = []
-    if not testOnUCO:
+    if False and not testOnUCO:  # DEVELOP!
         print("Choosing valid validation samples...")
 
         # Check what files are included in the TAR
@@ -571,8 +576,10 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         tar.close()
 
         nps_val = len(valid_idx_val)
-        np.savez('avalaeo_val_valid.npz', valid_idx_val)
+        # np.savez('avalaeo_val_valid.npz', valid_idx_val)
         print("Valid tuples validation: {}".format(nps_val))
+    else:
+        valid_idx_val = copy.deepcopy(valid_idx)
 
     if useVal4training:
         npairs_val = int(nps * 0.001)
@@ -582,10 +589,10 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     partitionAVA = {'train': valid_idx[0: npairs_train],
                     'validation': valid_idx[npairs_train: nps]}
 
-    if not testOnUCO:
-        partitionAVA['validation'] = list(range(0,len(allSamples_val)))
-    else:
-        partitionAVA['validation'] = list(range(0, 1000))    # TODO: just 1000 val samples
+#    if not testOnUCO:
+#        partitionAVA['validation'] = list(range(0,len(allSamples_val)))
+#    else:
+    # partitionAVA['validation'] = list(range(0, 1000))    # TODO: just 1000 val samples
 
     if False:  # hostname == "sylar" or DEBUG__:
         # partitionAVA={'train': list(range(0,1000)),
@@ -625,10 +632,11 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     params_avalaeoVal = copy.deepcopy(params_avalaeo)
     params_avalaeoVal['shuffle'] = False
     params_avalaeoVal['augmentation'] = False
-    params_avalaeoVal['tarpath'] = tarnameval
-    params_avalaeoVal['case_wanted'] = 'val'
+    params_avalaeoVal['tarpath'] = tarname  # tarnameval
+    params_avalaeoVal['case_wanted'] = 'train'  # 'val'
 
-    validation_generator = DataGeneratorAVALAEO(avalaeo_annots, partitionAVA['validation'], allSamples_val, **params_avalaeoVal)
+    # validation_generator = DataGeneratorAVALAEO(avalaeo_annots, partitionAVA['validation'], allSamples_val, **params_avalaeoVal)
+    validation_generator = DataGeneratorAVALAEO(avalaeo_annots, partitionAVA['validation'], allSamples, **params_avalaeoVal)
 
     print("- Data generators are ready!")
     sys.stdout.flush()
@@ -716,8 +724,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         total_time_epoch = 0
         nhardnegperbatch = int(np.ceil(batchsize*0.1))   # TODO: this is to be selected
 
-        # Loop on batches
-        nbatches = 4   # DEVELOP!!!
+        # Loop on batches        
         for batch_idx in range(0, nbatches):
             #print(batch_idx)
 
@@ -752,8 +759,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                     Yhn = np.zeros((nhardnegperbatch,2))
                     Yhn[:,0] = 1
                     Y = np.concatenate((Y, Yhn))
-
-                import pdb; pdb.set_trace()   # DEVELOP!
+                
                 etrainR = model.train_on_batch(x=X, y=Y)
 
                 del X
@@ -1086,7 +1092,7 @@ if __name__ == '__main__':
     optimizer = "Adam"
     custominfix = ""
     epoch_forced = -1
-    initmodel=""	
+    initmodel=""    
 
     useself64 = True
     testOnUCO = False
@@ -1097,7 +1103,7 @@ if __name__ == '__main__':
 
     outdirbase = homedir+"/experiments/deepLAEO/results3DconvGeomMBranchCropMapAVA"
     avalaeodir = homedir+"/databases/AVA2.2/Annotations/LAEO/round3"
-	
+    
     opts_short = "hg:e:l:n:s:a:z:b:w:d:m:M:f:F:k:c:C:G:r:R:L:u:o:E:t:S:I:O:"
     opts_long = ["gpurate=","epochs=","lrate=","sizedense=","ndense=",
                                     "augx=","batchnorm=","batchsize=","headweights=",
@@ -1206,9 +1212,9 @@ if __name__ == '__main__':
         elif opt in ("--DEBUG"):
             DEBUG__ = int(arg) > 0
         elif opt in ("-I", "--initmodel"):
-            initmodel = arg			
+            initmodel = arg         
         elif opt in ("-O", "--outdirbase"):
-            outdirbase = arg			
+            outdirbase = arg            
 
     # # DEVELOP: export head branch to multiple Python versions
     # print("Loading head model...")
