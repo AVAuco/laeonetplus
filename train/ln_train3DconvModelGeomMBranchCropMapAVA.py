@@ -197,10 +197,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     model.compile(optimizer=optimfun, loss='binary_crossentropy',
                   metrics=['accuracy'])
 
-    if False: #  DEBUG__:
-        case_wanted = 'val'   # TODO this has to be changed!!!
-    else:
-        case_wanted = 'train'
+    case_wanted = 'train'
 
     # Train the model
     # --------------------------------------
@@ -305,7 +302,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
             if not useVal4training:    # Also added for fine-tuning
                 partition['train'] = partition['train'] + partition['validation']
                 partition['validation'] = partition['test']
-
 
     if submean:
         meanPath = homedir+"/experiments/deepLAEO/results3DHeadPose/model001_setX_mean.npy"
@@ -511,7 +507,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
             print("* Info: a previous model was found. Warming up from it...[{:d}]".format(initepoch))
             model = load_model(previous_model)
 
-
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
@@ -523,7 +518,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
     if trainOnUCO:
         training_generator_uco = DataGeneratorLAEOhgfm(partition['train'], allSamples_uco, laeoIdxs, **params)
-
 
     print("Choosing valid training samples...")
     import tarfile
@@ -554,34 +548,11 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
     tardirval = os.path.join(homedir, "experiments/ava/preprocdata/", subdirtar, "val")
     tarnameval = os.path.join(tardirval, "allsamples"+suffix+".tar")
-    
-    valid_idx_val = []
-    if False and not testOnUCO:  # DEVELOP!
-        print("Choosing valid validation samples...")
 
-        # Check what files are included in the TAR
-        if not os.path.exists(tarnameval):
-            print("ERROR: cannot find tar file: {}".format(tarnameval))
-            exit(-1)
-        tar = tarfile.open(tarnameval, 'r')
+    # Extract some validation samples from the training ones
+    valid_idx_val = copy.deepcopy(valid_idx)
 
-        all_names = tar.getnames()
-
-        for i in range(0, len(allSamples_val)):
-            tup = allSamples_val[i]
-            memname = tup[0].replace("/", "_") + "_0000_" + tup[1] + ".jpg"
-
-            if memname in all_names:
-                valid_idx_val.append(i)
-        tar.close()
-
-        nps_val = len(valid_idx_val)
-        # np.savez('avalaeo_val_valid.npz', valid_idx_val)
-        print("Valid tuples validation: {}".format(nps_val))
-    else:
-        valid_idx_val = copy.deepcopy(valid_idx)
-
-    if useVal4training:
+    if useVal4training:  # This is just for a possible ultimate model
         npairs_val = int(nps * 0.001)
     else:
         npairs_val = int(nps * 0.15)
@@ -589,27 +560,10 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
     partitionAVA = {'train': valid_idx[0: npairs_train],
                     'validation': valid_idx[npairs_train: nps]}
 
-#    if not testOnUCO:
-#        partitionAVA['validation'] = list(range(0,len(allSamples_val)))
-#    else:
-    # partitionAVA['validation'] = list(range(0, 1000))    # TODO: just 1000 val samples
-
-    if False:  # hostname == "sylar" or DEBUG__:
-        # partitionAVA={'train': list(range(0,1000)),
-        #          'validation': list(range(1800,2000))}
-        partitionAVA['train'] = partitionAVA['train'][0:1000]
-        #partitionAVA['validation'] = partitionAVA['validation'][0:100]
-
     if finetuning:
         partitionAVA['train'] = partitionAVA['train'] + partitionAVA['validation']
 
     training_generator = DataGeneratorAVALAEO(avalaeo_annots, partitionAVA['train'], allSamples, **params_avalaeo)
-
-    from mj_genericUtils import mj_isDebugging
-
-    # if mj_isDebugging():
-    #     AA, BB = training_generator.__getitem__(0)
-
 
     if withSyntData:
         print("- Preparing synthetic training data...")
@@ -657,7 +611,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
     lr_decay = LearningRateScheduler(mj_lr_scheduler)
 
-    callbacks=[tensorboard, checkptr, lr_decay]
+    callbacks = [tensorboard, checkptr, lr_decay]
 
     lr_last_best_val = -1     # To store the latest best validation value
     lr_check_from_epoch = max(lr_check_from_epoch, epoch4real)
@@ -711,10 +665,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
             else:
                 nbatches = training_generator.__len__()
 
-        # TODO: for debugging!!!
-#            if not freezehead and useself64:
-#                nbatches = 10
-
         # Metrics
         cumm0 = 0
         cumm1 = 0
@@ -743,7 +693,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                     cumm0 += 0.1
                     cumm1 += 0.1
 
-            else: # Fake constants just for statistical info
+            else:  # Fake constants just for statistical info
                 cumm0 += 0.1
                 cumm1 += 0.1
 
@@ -887,7 +837,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                 if (nbatches - batch_idx) < 2:
                     sys.stdout.write(" Max hard neg: {:.4f} ({:.3f})".format(maxhardnegscore, inithardscore))
 
-
             # Mine hard negatives from this batch
             if miningHardNegativesInternal and useRealTrainData:
                 X, Y = training_generator.__getitem__(batch_idx)
@@ -898,7 +847,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                 for ii in range(0,len(X)):
                     xx = np.squeeze(X[ii][the_negs,])
                     Xneg_.append(xx)
-
 
                 predneg = model.predict(Xneg_)
 
@@ -1043,7 +991,6 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         # Update Kappa?
         if useRealTrainData and kappaH < max_kappaH and (epoch%2 == 0):
             kappaH = min(kappaH*1.1, max_kappaH)
-
 
     print("*** End of training ***")
 
