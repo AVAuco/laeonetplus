@@ -74,6 +74,7 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
                               lr_update=False, lr_factor=0.2, lr_patience=5, lr_check_from_epoch=10, lr_min=1e-07,
                               epoch_forced=-1, finetuning=False, windowLen = 10,
                               withSyntData = True, useself64=False, windowLenMap=1,
+                                               avalaeodir = "data",
                                               initmodel="", trainOnUCO=False, testOnUCO=False):
     '''
 
@@ -213,11 +214,13 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
         allSamples_uco = LU.mj_prepareTempLAEOsamples(laeoIdxs)
 
     # Data from AVA-LAEO
+    print('*Info: AVA-LAEO dir is '+avalaeodir)
     print('* Loading AVA data from file...')
     # avasubdir = "databases/ava_google/Annotations/LAEO/round3/"
     # pklfile = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + case_wanted + '__v2.2_tracks.pkl')
+    pklfile = os.path.join(avalaeodir, 'AVA_LAEO_all_rounds1-2-3_train__v2.2_tracks.pkl')
     #
-    # avalaeo_annots = AvaGoogleLAEOAnnotations(pklfile)
+    avalaeo_annots = AvaGoogleLAEOAnnotations(pklfile)
     # allSamples = avalaeo_annots.get_list_of_tuples(minlen=7)
     allSamples = dd.io.load("./data/avalaeo_samplist_train.h5")
 
@@ -226,9 +229,9 @@ def ln_fnTrain3DconvModelGeomMBranchCropMapAVA(outdirbase, gpuRate=0.75, initial
 
     # Same for the validation partition of AVA
     print('* Loading AVA (validation) data from file...')
-    # pklfile_val = os.path.join(homedir, avasubdir, 'AVA_LAEO_all_rounds1-2-3_' + 'val' + '__v2.2_tracks.pkl')
+    pklfile_val = os.path.join(avalaeodir, 'AVA_LAEO_all_rounds1-2-3_val__v2.2_tracks.pkl')
     #
-    # avalaeo_annots_val = AvaGoogleLAEOAnnotations(pklfile_val)
+    avalaeo_annots_val = AvaGoogleLAEOAnnotations(pklfile_val)
     # allSamples_val = avalaeo_annots_val.get_list_of_tuples(minlen=7)
     allSamples_val = dd.io.load("./data/avalaeo_samplist_val.h5")
 
@@ -1091,6 +1094,7 @@ if __name__ == '__main__':
     initfileHG = ""
 
     outdirbase = homedir+"/experiments/deepLAEO/results3DconvGeomMBranchCropMapAVA"
+    avalaeodir = homedir+"/databases/AVA2.2/Annotations/LAEO/round3"
 	
     opts_short = "hg:e:l:n:s:a:z:b:w:d:m:M:f:F:k:c:C:G:r:R:L:u:o:E:t:S:I:O:"
     opts_long = ["gpurate=","epochs=","lrate=","sizedense=","ndense=",
@@ -1105,7 +1109,8 @@ if __name__ == '__main__':
                                     "optimizer=", "Epoch=", "testdataft=",
                                     "usesyndata=","windowlen=","usemap=",
                                     "useself64=", "trainuco=", "testuco=",
-                                    "mapwindowlen=", "initmodel=", "outdirbase=", "DEBUG="]
+                                    "mapwindowlen=", "initmodel=", "outdirbase=",
+                 "avalaeodir=", "DEBUG="]
 
     try:
         opts, args = getopt.getopt(argv, opts_short,
@@ -1194,6 +1199,8 @@ if __name__ == '__main__':
             trainOnUCO = int(arg) > 0
         elif opt in ("--testuco"):
             testOnUCO = int(arg) > 0
+        elif opt in ("--avalaeodir"):
+            avalaeodir = arg
         elif opt in ("--DEBUG"):
             DEBUG__ = int(arg) > 0
         elif opt in ("-I", "--initmodel"):
@@ -1220,5 +1227,6 @@ if __name__ == '__main__':
                                      lr_update=lr_update, lr_patience=lr_patience, lr_factor=lr_factor,
                                             optimizer=optimizer, epoch_forced=epoch_forced, finetuning=useTest4finetuning,
                                             windowLen=windowLen, withSyntData=withSyntData, windowLenMap=windowLenMap,
-                                            useself64=useself64,trainOnUCO=trainOnUCO, testOnUCO=testOnUCO,
+                                            useself64=useself64, avalaeodir=avalaeodir,
+                                               trainOnUCO=trainOnUCO, testOnUCO=testOnUCO,
                                             initmodel=initmodel)

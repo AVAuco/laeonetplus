@@ -1,2 +1,5 @@
 opencv-python>=3.3,<4.0
 tensorflow-gpu>=1.15.1
+
+deepdish >= 0.3.6
+matplotlib >= 3.0
