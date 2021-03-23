@@ -397,7 +397,7 @@ def process_video(video_path, sanity_checks=False, verbose=False, framesdir=None
         tracksbf__ = track_forwards_backwards(detections, 0, len(detections), OUT_TRACKS=tracksb__, tracking_case='forwards', verbose=verbose)
         tracks = process_tracks_parameters(tracksbf__)
 
-        if verbose:
+        if verbose > 1:
             print("Printing generated tracks...")
             print(tracks)
 
