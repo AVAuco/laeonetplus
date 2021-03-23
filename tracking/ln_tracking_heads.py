@@ -128,7 +128,7 @@ def generate_detections(video_path, verbose=False, outputdir=None):
             y_pred = y_pred[:, np.array([2, 3, 4, 5, 1, 0])]
             # Scale back detections to original frame size
             y_pred[:, :4] = y_pred[:, :4] * np.tile(org_resolution, 2) / det_params.InputWidth
-            if verbose:
+            if verbose > 1:
                 print(y_pred)
             dets_dict[frame_idx] = y_pred
         else:
@@ -157,7 +157,7 @@ def process_detections_fromdetector(video_path, verbose=False, outputdir=None):
     video_name = os.path.splitext(video_name)[0]
 
     # load per-frame detections and save them
-    #dets: matrix with rows [xmin, ymin, xmax, ymax, score, class]
+    # dets: matrix with rows [xmin, ymin, xmax, ymax, score, class]
     detections_pkl_file = paths.detections_picklefile(video_name)
     if not osp.isfile(detections_pkl_file):
         if verbose:
