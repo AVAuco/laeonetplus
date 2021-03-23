@@ -410,7 +410,8 @@ def process_video(video_path, sanity_checks=False, verbose=False, framesdir=None
         tracks = load_pkl(out_track_name)
 
     # Visualize the results
-    display_tracks(video_path, tracks, verbose=verbose)
+    if verbose > 2:
+        display_tracks(video_path, tracks, verbose=verbose)
 
     return tracks
 
