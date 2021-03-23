@@ -31,7 +31,8 @@ python mains/ln_demo_test.py
 
 ### Detecting and tracking heads
 
-See older [GitHub repository](https://github.com/AVAuco/laeonet).
+Try this Google Colab to run LAEO prediction on a target video file: [notebook](https://colab.research.google.com/drive/1H28dEUORUmKIJGSh6N3B5sa_ocQsT1mT?usp=sharing)
+
 
 ### Install
 
