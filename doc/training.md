@@ -37,7 +37,7 @@ python train/ln_train3DconvModelGeomMBranchCropMapAVA.py -g 0.50 -e 60 -l 0.0001
 -d 0.2 -n 1 -s 32 -a 1 -z 0 -b 8 -f 1 -F 0 -k 0.3 -c 0 -R 2 -L 1 -m 0 -u 0 
 --useframecrop=0 --usegeometry=0 --initfilefm="" --usemap=1 --mapwindowlen=10 -S 0 
 --DEBUG=0 --trainuco=0 --testuco=0 --infix=_ss64jitter 
--w ./models/model-init-ssheadbranch.hdf5 --useself64=1 
+-w ./models/model-init-ssheadbranch_py36.hdf5 --useself64=1 
 --avalaeodir=./data
 ```
 
