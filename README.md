@@ -29,9 +29,13 @@ python mains/ln_demo_test.py
 
 *Training code will be available soon.*
 
-### Detecting and tracking heads
-
+### LAEO prediction on a given input video file  
 Try this Google Colab to run LAEO prediction on a target video file: [notebook](https://colab.research.google.com/drive/1H28dEUORUmKIJGSh6N3B5sa_ocQsT1mT?usp=sharing)
+
+
+### Detecting and tracking heads  
+Try this Google Colab to perform head detection and tracking on a target video file: [notebook](https://colab.research.google.com/drive/1pGVH6VTmUn_eiQgmR-H2zFMyrrs-ofef?usp=sharing)
+
 
 
 ### Install
