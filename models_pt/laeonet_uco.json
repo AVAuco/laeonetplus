@@ -1,0 +1,7 @@
+{
+  "window_len": 10,
+  "window_len_map": 10,
+  "head_size": 64,
+  "map_size": 64,
+  "dense_size": 32
+}
