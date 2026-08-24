@@ -1,5 +1,6 @@
-opencv-python>=3.3,<4.0
-tensorflow-gpu>=1.15.1
-
-deepdish >= 0.3.6
-matplotlib >= 3.0
+numpy>=1.24
+scipy>=1.10
+opencv-python>=4.9
+torch>=2.2
+h5py>=3.10
+ultralytics>=8.2
